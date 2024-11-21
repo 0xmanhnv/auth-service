@@ -9,9 +9,10 @@ import (
 )
 
 type Configuration struct {
-	MongoDBURI   string
-	RedisAddress string
-	DatabaseName string
+	MongoDBURI       string
+	RedisAddress     string
+	DatabaseName     string
+	TelegramBotToken string
 }
 
 func LoadConfig() (*Configuration, error) {
@@ -22,8 +23,9 @@ func LoadConfig() (*Configuration, error) {
 	fmt.Println(os.Getenv("MONGODB_URI"))
 
 	return &Configuration{
-		MongoDBURI:   os.Getenv("MONGODB_URI"),
-		DatabaseName: os.Getenv("DATABASE_NAME"),
-		RedisAddress: os.Getenv("REDIS_ADDRESS"),
+		MongoDBURI:       os.Getenv("MONGODB_URI"),
+		DatabaseName:     os.Getenv("DATABASE_NAME"),
+		RedisAddress:     os.Getenv("REDIS_ADDRESS"),
+		TelegramBotToken: os.Getenv("TELEGRAM_BOT_TOKEN"),
 	}, nil
 }

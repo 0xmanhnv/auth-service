@@ -11,12 +11,13 @@ import (
 
 var (
 	Client       *mongo.Client
-	DatabaseName = os.Getenv("DATABASE_NAME")
+	DatabaseName string
 )
 
 // Init khởi tạo kết nối đến MongoDB
 // Init initializes the connection to MongoDB
-func InitMongoDB(mongoURI string) {
+func InitMongoDB(mongoURI string) *mongo.Client {
+	DatabaseName = os.Getenv("DATABASE_NAME")
 	var err error
 	Client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoURI))
 	if err != nil {
@@ -30,4 +31,6 @@ func InitMongoDB(mongoURI string) {
 	}
 
 	log.Println("Connected to MongoDB!")
+
+	return Client
 }

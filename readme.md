@@ -88,3 +88,6 @@ user-service: Dịch vụ quản lý người dùng.
 
 socket/socket_client.go: Kết nối đến các dịch vụ socket (ví dụ: WebSocket) để xử lý các yêu cầu thời gian thực.
 api-gateway: Dịch vụ cổng API để điều phối các yêu cầu đến các dịch vụ khác.
+
+
+https://github.com/bxcodec/go-clean-arch
