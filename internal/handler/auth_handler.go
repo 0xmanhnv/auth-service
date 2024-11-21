@@ -11,11 +11,13 @@ import (
 )
 
 type AuthHandler struct {
-	AuthService *service.AuthService
+	AuthService AuthService
 }
 
-func NewAuthHandler(authService *service.AuthService) *AuthHandler {
-	return &AuthHandler{AuthService: authService}
+func NewAuthHandler(authSvc *service.AuthService) *AuthHandler {
+	return &AuthHandler{
+		AuthService: authSvc,
+	}
 }
 
 // RegisterHandler xử lý yêu cầu đăng ký
@@ -25,7 +27,7 @@ func (h *AuthHandler) RegisterHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
-	if err := h.AuthService.Register(user); err != nil {
+	if err := h.AuthService.Register(c, user); err != nil {
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return
 	}
@@ -39,7 +41,7 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 		return
 	}
-	token, err := h.AuthService.Login(user.Username, user.Password)
+	token, err := h.AuthService.Login(c, user.Username, user.Password)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return

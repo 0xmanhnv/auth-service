@@ -2,26 +2,35 @@ package redis
 
 import (
 	"context"
+	"os"
+	"strconv"
 
 	"github.com/go-redis/redis/v8"
 )
 
-type RedisClient struct {
-	client *redis.Client
-}
+var ctx = context.Background()
+var client *redis.Client
 
-func NewRedisClient(address string) *RedisClient {
-	rdb := redis.NewClient(&redis.Options{
-		Addr: address,
+func InitRedis() {
+
+	redisDB, err := strconv.ParseInt(os.Getenv("REDIS_DB"), 10, 64) // 10 là cơ số, 64 là bit
+	if err != nil {
+		redisDB = 0
+	}
+
+	client = redis.NewClient(&redis.Options{
+		Addr:     os.Getenv("REDIS_ADDRESS"),
+		Password: os.Getenv("REDIS_PASSWORD"), // Mật khẩu nếu có
+		DB:       int(redisDB),                // Sử dụng DB mặc định
 	})
-	return &RedisClient{client: rdb}
+
+	// Kiểm tra kết nối
+	if err := client.Ping(ctx).Err(); err != nil {
+		panic(err)
+	}
 }
 
-func (r *RedisClient) Set(ctx context.Context, key string, value interface{}) error {
-	return r.client.Set(ctx, key, value, 0).Err()
-}
-
-func (r *RedisClient) Get(ctx context.Context, key string) (string, error) {
-	val, err := r.client.Get(ctx, key).Result()
-	return val, err
+// Hàm để lấy client Redis
+func GetClient() *redis.Client {
+	return client
 }

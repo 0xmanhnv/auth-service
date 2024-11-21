@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"auth-service/internal/config"
 	"auth-service/internal/model"
 	"context"
 
@@ -13,25 +12,38 @@ import (
 
 // UserRepository struct holds the MongoDB client
 type UserRepository struct {
-	client *mongo.Client
+	Client *mongo.Client
 }
 
 // NewUserRepository initializes a new UserRepository
-func NewUserRepository(cfg *config.Configuration) (*UserRepository, error) {
-	client := db.Client // Use the client from the db package
-	return &UserRepository{client: client}, nil
+func NewUserRepository(client *mongo.Client) *UserRepository {
+	return &UserRepository{
+		Client: client,
+	}
 }
 
 // CreateUser inserts a new user into the database
 func (r *UserRepository) CreateUser(user model.User) error {
-	_, err := r.client.Database(db.DatabaseName).Collection("users").InsertOne(context.TODO(), user)
+	_, err := r.Client.Database(db.DatabaseName).Collection("users").InsertOne(context.TODO(), user)
 	return err
 }
 
 // FindUserByUsername retrieves a user by their username
 func (r *UserRepository) FindUserByUsername(username string) (*model.User, error) {
 	var user model.User
-	err := r.client.Database(db.DatabaseName).Collection("users").FindOne(context.TODO(), bson.M{"username": username}).Decode(&user)
+	err := r.Client.Database(db.DatabaseName).Collection("users").FindOne(context.TODO(), bson.M{"username": username}).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
+func (r *UserRepository) FindUserByChatTelegramID(chatTelegramID int64) (*model.User, error) {
+	var user model.User
+	err := r.Client.Database(db.DatabaseName).Collection("users").FindOne(
+		context.TODO(),
+		bson.M{"chat_telegram_id": chatTelegramID},
+	).Decode(&user)
 	if err != nil {
 		return nil, err
 	}
