@@ -1,0 +1,153 @@
+basePath: /api/v1
+definitions:
+  model.User:
+    properties:
+      chatTelegramID:
+        type: integer
+      firstName:
+        type: string
+      id:
+        type: string
+      password:
+        type: string
+      photoUrl:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Handles user login
+      parameters:
+      - description: User credentials
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login a user
+      tags:
+      - auth
+  /auth/login/telegram:
+    get:
+      consumes:
+      - application/json
+      description: Handles login via Telegram authentication
+      parameters:
+      - description: User ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Username
+        in: query
+        name: username
+        required: true
+        type: string
+      - description: First Name
+        in: query
+        name: first_name
+        required: true
+        type: string
+      - description: Authentication Date
+        in: query
+        name: auth_date
+        required: true
+        type: integer
+      - description: Photo URL
+        in: query
+        name: photo_url
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login with Telegram
+      tags:
+      - auth
+  /auth/protected:
+    get:
+      description: Handles requests to a protected route
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Protected route access
+          schema:
+            additionalProperties: true
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Access protected route
+      tags:
+      - auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Handles user registration
+      parameters:
+      - description: User information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid input
+          schema:
+            additionalProperties: true
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
+      tags:
+      - auth
+swagger: "2.0"

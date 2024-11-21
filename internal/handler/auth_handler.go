@@ -20,7 +20,17 @@ func NewAuthHandler(authSvc *service.AuthService) *AuthHandler {
 	}
 }
 
-// RegisterHandler xử lý yêu cầu đăng ký
+// RegisterHandler godoc
+// @Summary Register a new user
+// @Description Handles user registration
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param user body model.User true "User information"
+// @Success 201 {object} map[string]interface{} "User created"
+// @Failure 400 {object} map[string]interface{} "Invalid input"
+// @Failure 409 {object} map[string]interface{} "Conflict"
+// @Router /auth/register [post]
 func (h *AuthHandler) RegisterHandler(c *gin.Context) {
 	var user model.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -34,7 +44,17 @@ func (h *AuthHandler) RegisterHandler(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "User created"})
 }
 
-// LoginHandler xử lý yêu cầu đăng nhập
+// LoginHandler godoc
+// @Summary Login a user
+// @Description Handles user login
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param user body model.User true "User credentials"
+// @Success 200 {object} map[string]interface{} "Login successful"
+// @Failure 400 {object} map[string]interface{} "Invalid input"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Router /auth/login [post]
 func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	var user model.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -49,7 +69,14 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": token})
 }
 
-// ProtectedHandler xử lý yêu cầu đến route bảo vệ
+// ProtectedHandler godoc
+// @Summary Access protected route
+// @Description Handles requests to a protected route
+// @Tags auth
+// @Produce json
+// @Success 200 {object} map[string]interface{} "Protected route access"
+// @Router /auth/protected [get]
+// @Security BearerAuth
 func (h *AuthHandler) ProtectedHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "This is a protected route"})
 }

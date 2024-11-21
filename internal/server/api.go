@@ -16,7 +16,7 @@ func (s *Server) RegisterRoutes(r *gin.Engine) http.Handler {
 	// Define Auth service
 	userRepo := repository.NewUserRepository(db.Client)
 	authSvc := service.NewAuthService(userRepo)
-	handler := handler.NewAuthHandler(authSvc)
+	authHandler := handler.NewAuthHandler(authSvc)
 
 	// Define API routes
 	v1Routes := r.Group("/api/v1")
@@ -24,11 +24,48 @@ func (s *Server) RegisterRoutes(r *gin.Engine) http.Handler {
 
 		authRoutes := v1Routes.Group("/auth")
 		{
-			authRoutes.GET("/telegram", handler.LoginWithTelegramHandler)
+			// @Summary Login with Telegram
+			// @Description Login using Telegram authentication
+			// @Tags auth
+			// @Accept json
+			// @Produce json
+			// @Success 200 {object} map[string]interface{}
+			// @Router /auth/telegram [get]
+			authRoutes.GET("/telegram", authHandler.LoginWithTelegramHandler)
 
-			authRoutes.POST("/register", handler.RegisterHandler)
-			authRoutes.POST("/login", handler.LoginHandler)
-			authRoutes.GET("/protected", middleware.ValidateToken(), handler.ProtectedHandler)
+			// @Summary Register a new user
+			// @Description Register a new user in the system
+			// @Tags auth
+			// @Accept json
+			// @Produce json
+			// @Param user body handler.RegisterRequest true "User registration details"
+			// @Success 201 {object} map[string]interface{}
+			// @Router /auth/register [post]
+			authRoutes.POST("/register", authHandler.RegisterHandler)
+
+			// @Summary User login
+			// @Description Login an existing user
+			// @Tags auth
+			// @Accept json
+			// @Produce json
+			// @Param login body handler.LoginRequest true "User login details"
+			// @Success 200 {object} map[string]interface{}
+			// @Router /auth/login [post]
+			authRoutes.POST("/login", authHandler.LoginHandler)
+
+			// @Summary Get protected resource
+			// @Description Access a protected resource
+			// @Tags auth
+			// @Accept json
+			// @Produce json
+			// @Success 200 {object} map[string]interface{}
+			// @Router /auth/protected [get]
+			// @Security ApiKeyAuth
+			// @securityDefinitions.bearer BearerAuth
+			// @type apiKey
+			// @name Authorization
+			// @in header
+			authRoutes.GET("/protected", middleware.ValidateToken(), authHandler.ProtectedHandler)
 		}
 
 	}
