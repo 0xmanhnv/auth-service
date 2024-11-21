@@ -91,3 +91,10 @@ api-gateway: Dịch vụ cổng API để điều phối các yêu cầu đến 
 
 
 https://github.com/bxcodec/go-clean-arch
+
+
+## Gen docs
+
+```bash
+swag init -g .\cmd\main.go -o ./docs
+```

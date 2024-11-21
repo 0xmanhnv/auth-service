@@ -17,6 +17,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// LoginWithTelegramHandler godoc
+// @Summary Login with Telegram
+// @Description Handles login via Telegram authentication
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param id query string true "User ID"
+// @Param username query string true "Username"
+// @Param first_name query string true "First Name"
+// @Param auth_date query int true "Authentication Date"
+// @Param photo_url query string false "Photo URL"
+// @Success 200 {object} map[string]interface{} "Login successful"
+// @Failure 401 {object} map[string]interface{} "Unauthorized"
+// @Router /auth/login/telegram [get]
 func (uHandler *AuthHandler) LoginWithTelegramHandler(c *gin.Context) {
 	// Lấy thông tin từ query parameters
 	userID := c.Query("id")
