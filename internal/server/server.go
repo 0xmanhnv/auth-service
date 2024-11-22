@@ -38,7 +38,7 @@ func NewServer() *http.Server {
 	// Declare Server config
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", NewServer.port),
-		Handler:      NewServer.GinServer(cfg),
+		Handler:      NewServer.GinServer(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
@@ -47,12 +47,19 @@ func NewServer() *http.Server {
 	return server
 }
 
-func (s *Server) GinServer(cfg *config.Configuration) http.Handler {
+func (s *Server) GinServer() http.Handler {
+
+	// Set gin mode
+	if os.Getenv("APP_MODE") == "release" || os.Getenv("APP_MODE") == "production" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	// Init gin default
 	r := gin.Default()
+	r.Use(gin.Logger(), gin.Recovery())
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:8080"}, // Add your frontend URL
+		AllowOrigins:     config.Cfg.AllowOrigins,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
 		AllowHeaders:     []string{"Accept", "Authorization", "Content-Type"},
 		AllowCredentials: true, // Enable cookies/auth
@@ -74,7 +81,6 @@ func (s *Server) GinServer(cfg *config.Configuration) http.Handler {
 			swaggerfiles.Handler,
 			ginSwagger.DefaultModelsExpandDepth(1),
 			ginSwagger.DeepLinking(true),
-			ginSwagger.PersistAuthorization(true),
 			ginSwagger.PersistAuthorization(true),
 		),
 	)

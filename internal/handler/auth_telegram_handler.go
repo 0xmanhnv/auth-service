@@ -2,6 +2,7 @@ package handler
 
 import (
 	"auth-service/internal/model"
+	"auth-service/pkg/response"
 	"auth-service/pkg/utils"
 	"crypto/hmac"
 	"crypto/sha256"
@@ -30,7 +31,7 @@ import (
 // @Param photo_url query string false "Photo URL"
 // @Success 200 {object} map[string]interface{} "Login successful"
 // @Failure 401 {object} map[string]interface{} "Unauthorized"
-// @Router /auth/login/telegram [get]
+// @Router /auth/telegram [get]
 func (uHandler *AuthHandler) LoginWithTelegramHandler(c *gin.Context) {
 	// Lấy thông tin từ query parameters
 	userID := c.Query("id")
@@ -41,7 +42,14 @@ func (uHandler *AuthHandler) LoginWithTelegramHandler(c *gin.Context) {
 
 	// Kiểm tra thời gian xác thực (không quá 5 phút)
 	if time.Now().Unix()-utils.ParseInt(authDate) > 300 {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Expired auth date"})
+		c.JSON(
+			http.StatusUnauthorized,
+			response.Response{
+				Status:  "error",
+				Message: "Login failed",
+				Error:   "Expired auth date",
+			},
+		)
 		return
 	}
 
@@ -51,7 +59,11 @@ func (uHandler *AuthHandler) LoginWithTelegramHandler(c *gin.Context) {
 	if !checkTelegramAuthorization(params) {
 		c.JSON(
 			http.StatusUnauthorized,
-			gin.H{"error": "Invalid hash"},
+			response.Response{
+				Status:  "error",
+				Message: "Login failed",
+				Error:   "Invalid hash",
+			},
 		)
 		return
 	}
@@ -65,33 +77,49 @@ func (uHandler *AuthHandler) LoginWithTelegramHandler(c *gin.Context) {
 	}
 	token, err := uHandler.AuthService.LoginWithTelegram(c, user)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		c.JSON(
+			http.StatusUnauthorized,
+			response.Response{
+				Status:  "error",
+				Message: "Login failed",
+				Error:   err.Error(),
+			},
+		)
 		return
 	}
 
 	c.JSON(
 		http.StatusOK,
-		gin.H{
-			"message":  "Login successful",
-			"username": username,
-			"token":    token,
+		response.Response{
+			Status:  "success",
+			Message: "Login successful",
+			Data: gin.H{
+				"username": username,
+				"token":    token,
+			},
 		},
 	)
 }
 
 // id, first_name, last_name, username, photo_url, auth_date and hash
 func checkTelegramAuthorization(params url.Values) bool {
+	// Create a hash of the secret key
 	keyHash := sha256.New()
 	keyHash.Write([]byte(os.Getenv("TELEGRAM_BOT_TOKEN")))
 	secretkey := keyHash.Sum(nil)
 
+	// Check the hash
 	var checkparams []string
 	for k, v := range params {
 		if k != "hash" {
 			checkparams = append(checkparams, fmt.Sprintf("%s=%s", k, v[0]))
 		}
 	}
+
+	// Sort the parameters
 	sort.Strings(checkparams)
+
+	// Join and create the hash
 	checkString := strings.Join(checkparams, "\n")
 	hash := hmac.New(sha256.New, secretkey)
 	hash.Write([]byte(checkString))

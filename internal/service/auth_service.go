@@ -5,16 +5,10 @@ import (
 	"auth-service/internal/repository"
 	"context"
 	"errors"
-	"time"
+	"os"
 
-	"github.com/golang-jwt/jwt/v5"
+	"auth-service/pkg/jwt"
 )
-
-type UserRepository interface {
-	CreateUser(user model.User) error
-	FindUserByUsername(username string) (*model.User, error)
-	FindUserByChatTelegramID(chatTelegramID int64) (*model.User, error)
-}
 
 type AuthService struct {
 	userRepo UserRepository
@@ -39,7 +33,7 @@ func (s *AuthService) Login(ctx context.Context, username, password string) (str
 	if err != nil || user.Password != password {
 		return "", errors.New("invalid credentials")
 	}
-	return s.GenerateToken(ctx, user.Username)
+	return jwt.GenerateToken(ctx, user.Username, os.Getenv("JWT_SECRET_KEY"))
 }
 
 func (s *AuthService) LoginWithTelegram(ctx context.Context, u model.User) (string, error) {
@@ -54,15 +48,6 @@ func (s *AuthService) LoginWithTelegram(ctx context.Context, u model.User) (stri
 			return "", err
 		}
 	}
-	return s.GenerateToken(ctx, user.Username)
-}
 
-func (s *AuthService) GenerateToken(ctx context.Context, username string) (string, error) {
-	claims := jwt.MapClaims{
-		"username": username,
-		"exp":      time.Now().Add(time.Hour * 72).Unix(),
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte("your_secret_key")) // Thay "your_secret_key" bằng khóa bí mật của bạn
+	return jwt.GenerateToken(ctx, user.Username, os.Getenv("JWT_SECRET_KEY"))
 }

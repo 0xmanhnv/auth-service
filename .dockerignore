@@ -1,0 +1,27 @@
+docker-compose-dev.yml
+docker-compose.yml
+Dockerfile
+# Ignore the build directory
+build/
+
+# Ignore Go module files
+*.mod
+*.sum
+
+# Ignore binary files
+myapp
+*.exe
+*.out
+
+# Ignore temporary files
+*.tmp
+*.log
+
+# Ignore version control directories
+.git/
+.gitignore
+
+# Ignore IDE/editor files
+.vscode/
+.idea/
+*.swp

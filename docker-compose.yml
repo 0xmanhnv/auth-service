@@ -13,8 +13,8 @@ services:
 
   mongo:
     image: mongo:latest
-    ports:
-      - "27017:27017" # Cổng MongoDB
+    # ports:
+    #   - "27017:27017" # Cổng MongoDB
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=rootpassword

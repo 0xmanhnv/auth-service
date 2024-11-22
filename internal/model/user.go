@@ -10,3 +10,8 @@ type User struct {
 	FirstName      string             `bson:"first_name"`
 	PhotoUrl       string             `bson:"photo_url"`
 }
+
+type LoginRequest struct {
+	Username string `bson:"username"`
+	Password string `bson:"password"`
+}

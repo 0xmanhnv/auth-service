@@ -1,4 +1,15 @@
 services:
+  app-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080" # Cổng mà ứng dụng Go sẽ chạy
+    environment:
+      - MONGODB_URI=mongodb://root:rootpassword@mongo:27017
+      - DATABASE_NAME=auth_db
+    depends_on:
+      - mongo
   mongo:
     image: mongo:latest
     ports:

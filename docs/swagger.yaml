@@ -1,5 +1,12 @@
 basePath: /api/v1
 definitions:
+  model.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
   model.User:
     properties:
       chatTelegramID:
@@ -33,7 +40,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/model.User'
+          $ref: '#/definitions/model.LoginRequest'
       produces:
       - application/json
       responses:
@@ -53,52 +60,6 @@ paths:
             additionalProperties: true
             type: object
       summary: Login a user
-      tags:
-      - auth
-  /auth/login/telegram:
-    get:
-      consumes:
-      - application/json
-      description: Handles login via Telegram authentication
-      parameters:
-      - description: User ID
-        in: query
-        name: id
-        required: true
-        type: string
-      - description: Username
-        in: query
-        name: username
-        required: true
-        type: string
-      - description: First Name
-        in: query
-        name: first_name
-        required: true
-        type: string
-      - description: Authentication Date
-        in: query
-        name: auth_date
-        required: true
-        type: integer
-      - description: Photo URL
-        in: query
-        name: photo_url
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Login successful
-          schema:
-            additionalProperties: true
-            type: object
-        "401":
-          description: Unauthorized
-          schema:
-            additionalProperties: true
-            type: object
-      summary: Login with Telegram
       tags:
       - auth
   /auth/protected:
@@ -148,6 +109,52 @@ paths:
             additionalProperties: true
             type: object
       summary: Register a new user
+      tags:
+      - auth
+  /auth/telegram:
+    get:
+      consumes:
+      - application/json
+      description: Handles login via Telegram authentication
+      parameters:
+      - description: User ID
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: Username
+        in: query
+        name: username
+        required: true
+        type: string
+      - description: First Name
+        in: query
+        name: first_name
+        required: true
+        type: string
+      - description: Authentication Date
+        in: query
+        name: auth_date
+        required: true
+        type: integer
+      - description: Photo URL
+        in: query
+        name: photo_url
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login with Telegram
       tags:
       - auth
 swagger: "2.0"

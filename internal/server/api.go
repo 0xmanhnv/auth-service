@@ -48,7 +48,7 @@ func (s *Server) RegisterRoutes(r *gin.Engine) http.Handler {
 			// @Tags auth
 			// @Accept json
 			// @Produce json
-			// @Param login body handler.LoginRequest true "User login details"
+			// @Param login body model.LoginRequest true "User login details"
 			// @Success 200 {object} map[string]interface{}
 			// @Router /auth/login [post]
 			authRoutes.POST("/login", authHandler.LoginHandler)
@@ -65,7 +65,7 @@ func (s *Server) RegisterRoutes(r *gin.Engine) http.Handler {
 			// @type apiKey
 			// @name Authorization
 			// @in header
-			authRoutes.GET("/protected", middleware.ValidateToken(), authHandler.ProtectedHandler)
+			authRoutes.GET("/protected", middleware.JWTMiddleware(), authHandler.ProtectedHandler)
 		}
 
 	}
